@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: black;
+      font-family: 'Courier New', monospace;
+      overflow: hidden;
+    }
+
+    .game-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      transform-origin: top left;
+      top: -60px;
+    }
+
+    canvas {
+      border: none;
+      background-color: transparent;
+      width: 100%;
+      height: 100%;
+    }
+
+    #game-title {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  color: #b4fa97;
+  white-space: pre;
+  line-height: 1.1;
+  text-align: center;
+  z-index: 10;
+}
+
+.game-over {
+  position: absolute;
+  font-size: 11px;
+  color: #C2FFAE;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  display: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 5px;
+  white-space: pre;
+  line-height: 1.3;
+}
+
+    .score {
+      position: absolute;
+      font-size: 18px;
+      color: #b4fa97;
+      font-family: 'Courier New', monospace;
+      top: 380px;
+      left: 52%;
+      transform: translateX(-50%);
+    }
+
+    .high-score {
+      position: absolute;
+      font-size: 18px;
+      color: #b4fa97;
+      font-family: 'Courier New', monospace;
+      top: 270px;
+      left: 70%;
+      transform: translateX(-50%);
+      display: none;
+    }
+
+    .play-button, .start-button, .return-button, .versus-button {
+      position: absolute;
+      font-size: 20px;
+      color: #b4fa97;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+    }
+
+    .play-button {
+      top: 115%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+    }
+
+    .versus-button {
+      top: 130%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      color: green;
+    }
+
+    .start-button {
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+
+    #start-versus-button {
+      top: 90%;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+
+    .return-button {
+      top: 170%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+    }
+
+    .demo-text {
+      position: absolute;
+      font-size: 17px;
+      color: #b4fa97;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      opacity: 0;
+      animation: fadeInOut 1s infinite;
+      top: 102%;
+      left: 52%;
+      transform: translateX(-50%);
+    }
+
+    .settings {
+      position: absolute;
+      color: #b4fa97;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      display: none;
+      top: 130%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .settings .apple-settings, .settings .speed-settings {
+      margin-bottom: 10px;
+    }
+
+    .settings button {
+      background: none;
+      border: none;
+      color: #b4fa97;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .versus-settings {
+      display: none;
+      position: absolute;
+      color: #b4fa97;
+      font-family: 'Courier New', monospace;
+      text-align: left;
+      top: 130%;
+      left: 50%;
+      white-space: nowrap;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* player settings positions */
+    .versus-settings .player-settings {
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .versus-settings .player1-settings {
+      left: -50;
+      top: -50px;
+    }
+
+    .versus-settings .player2-settings {
+      left: -50;
+      top: -53px;
+    }
+
+    .versus-settings .player3-settings {
+      left: 50;
+      top: -60px;
+    }
+
+    .versus-settings .player4-settings {
+      left: -50;
+      top: -60px;
+    }
+
+    .versus-settings .apple-settings {
+      
+      position: relative;
+      left: 230px;
+      top: 100px;
+    }
+
+    .versus-settings .speed-settings {
+      margin-bottom: 10px;
+      position: relative;
+      left: 57%;
+      top: 120;
+    }
+
+    .versus-settings .rounds-settings {
+      margin-bottom: 10px;
+      position: relative;
+      left: 230px;
+      top: 0;
+    }
+
+    .versus-settings button {
+      background: none;
+      border: none;
+      color: #b4fa97;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    .player1 {
+      color: green;
+    }
+
+    .player2 {
+      color: blue;
+    }
+
+    .player3 {
+      color: orange;
+    }
+
+    .player4 {
+      color: purple;
+    }
+
+    .none {
+      color: red;
+    }
+
+    .play-button:hover, .versus-button:hover,
+    .play-button.selected, .versus-button.selected {
+      text-decoration: none;
+    }
+
+    .play-button:hover::before, .versus-button:hover::before,
+    .play-button.selected::before, .versus-button.selected::before {
+      content: '[';
+    }
+
+    .play-button:hover::after, .versus-button:hover::after,
+    .play-button.selected::after, .versus-button.selected::after {
+      content: ']';
+    }
+
+    .pause-button {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      color: #b4fa97;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .pause-button:hover {
+      opacity: 1;
+    }
+
+    .round-winner {
+      position: absolute;
+      font-size: 24px;
+      color: #C2FFAE;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      display: none;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .game-winner {
+      position: absolute;
+      font-size: 36px;
+      color: #b4fa97;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      display: none;
+      top: 132%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .player-points {
+      position: absolute;
+      font-size: 16px;
+      font-family: 'Courier New', monospace;
+      top: 270px;
+      left: 70%;
+      transform: translateX(-50%);
+      display: none;
+    }
+
+    .current-round {
+      position: absolute;
+      font-size: 20px;
+      color: #b4fa97;
+      font-family: 'Courier New', monospace;
+      top: 200px;
+      left: 70%;
+      transform: translateX(-50%);
+      display: none;
+    }
+
+    .player1-points {
+      color: green;
+    }
+
+    .player2-points {
+      color: blue;
+    }
+
+    .player3-points {
+      color: orange;
+    }
+
+    .player4-points {
+      color: purple;
+    }
+
+.madeby {
+  position: absolute;
+  left: 20px;
+  top: 95%;
+  font-size: 15px;
+  color: #b4fa97;
+  font-family: 'Courier New', monospace;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.version {
+  font-size: 12px;
+  margin-top: 2px;
+}
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <canvas width="400" height="400" id="game"></canvas>
+    <div id="game-over" class="game-over">
+  <pre style="margin:0;font-family:'Courier New',monospace;color:#C2FFAE;text-align:center;">
+  ____                         ___                 
+ / ___| __ _ _ __ ___   ___   / _ \__   _____ _ __ 
+| |  _ / _` | '_ ` _ \ / _ \ | | | \ \ / / _ \ '__|
+| |_| | (_| | | | | | |  __/ | |_| |\ V /  __/ |   
+ \____|\__,_|_| |_| |_|\___|  \___/  \_/ \___|_|   
+  </pre>
+  <div style="text-align:center;margin-top:10px;">Press Enter to Restart</div>
+</div>
+    <div id="round-winner" class="round-winner"></div>
+    <div id="game-winner" class="game-winner"></div>
+    <div id="score" class="score">Score: 0</div>
+    <div id="demo-text" class="demo-text">[Demo]</div>
+    <div id="play-button" class="play-button">Play Snake Classic</div>
+    <div id="versus-button" class="versus-button">Play Versus Mode</div>
+    <div id="settings" class="settings">
+      <div class="apple-settings">
+        Apples: <span id="apple-count">1</span>
+        <button id="decrease-apple">&lt;</button>
+        <button id="increase-apple">&gt;</button>
+      </div>
+      <div class="speed-settings">
+        Speed: <span id="speed-count">1</span>
+        <button id="decrease-speed">&lt;</button>
+        <button id="increase-speed">&gt;</button>
+      </div>
+      <div id="start-button" class="start-button">[Start the Game]</div>
+    </div>
+    <div id="versus-settings" class="versus-settings">
+      <div class="apple-settings">
+        Apples: <span id="versus-apple-count">1</span>
+        <button id="versus-decrease-apple">&lt;</button>
+        <button id="versus-increase-apple">&gt;</button>
+      </div>
+      <div class="speed-settings">
+        Speed: <span id="versus-speed-count">1</span>
+        <button id="versus-decrease-speed">&lt;</button>
+        <button id="versus-increase-speed">&gt;</button>
+      </div>
+      <div class="rounds-settings">
+        Rounds: <span id="rounds-count">3</span>
+        <button id="decrease-rounds">&lt;</button>
+        <button id="increase-rounds">&gt;</button>
+      </div>
+      <div class="player-settings player1-settings">
+        <div class="player1">Player 1: <span id="player1-mode">Keys</span> <button id="player1-prev">&lt;</button><button id="player1-next">&gt;</button></div>
+      </div>
+      <div class="player-settings player2-settings">
+        <div class="player2">Player 2: <span id="player2-mode">WASD</span> <button id="player2-prev">&lt;</button><button id="player2-next">&gt;</button></div>
+      </div>
+      <div class="player-settings player3-settings">
+        <div class="player3">Player 3: <span id="player3-mode">None</span> <button id="player3-prev">&lt;</button><button id="player3-next">&gt;</button></div>
+      </div>
+      <div class="player-settings player4-settings">
+        <div class="player4">Player 4: <span id="player4-mode">None</span> <button id="player4-prev">&lt;</button><button id="player4-next">&gt;</button></div>
+      </div>
+      <div id="start-versus-button" class="start-button">[Start the Game]</div>
+    </div>
+    <div id="return-button" class="return-button">-Return to Menu-</div>
+  </div>
+
+  <div class="pause-button" id="pause-button">Pause</div>
+<div class="madeby" id="madeby">
+  Made By Mr.Crow
+  <div class="version">v0.2</div>
+</div>
+  <div id="high-score" class="high-score">High Score: 0</div>
+  <div id="player-points" class="player-points">
+    <div class="player1-points">Player 1: 0</div>
+    <div class="player2-points">Player 2: 0</div>
+    <div class="player3-points">Player 3: 0</div>
+    <div class="player4-points">Player 4: 0</div>
+  </div>
+  <div id="current-round" class="current-round">Round: 1</div>
+
+  <script>
+    var canvas = document.getElementById('game');
+    var context = canvas.getContext('2d');
+    
+    canvas.width = 400;
+    canvas.height = 400;
+    
+    var grid = 16;
+    var score = 0;
+    var highScore = localStorage.getItem('highScore') || 0;
+    var isGameOver = false;
+    var isAI = true;
+    var isClassicMode = false;
+    var isVersusMode = false;
+    var isShrinking = false;
+    var canRestart = true;
+    var isDeathAnimationStarted = false;
+    var isGameOverAnimation = false;
+    var gameOverLoopId = null;
+
+    var snake = {
+      x: Math.floor(Math.random() * ((canvas.width - grid * 6) / grid)) * grid + grid * 3,
+      y: Math.floor(Math.random() * ((canvas.height - grid * 6) / grid)) * grid + grid * 3,
+      dx: grid,
+      dy: 0,
+      cells: [],
+      maxCells: 4
+    };
+
+    // Versus mode variables
+    var players = [];
+    var activePlayers = 0;
+    var playerPoints = [0, 0, 0, 0];
+    var currentRound = 1;
+    var totalRounds = 3;
+    var isRoundOver = false;
+    var isGameWon = false;
+
+    var apples = [];
+
+    let inputQueue = [];
+    let fps = 10;
+    let frameDelay = 1000 / fps;
+    let lastUpdateTime = 0;
+    let gameLoopId = null;
+    let isPaused = false;
+
+    let appleCount = 1;
+    let speedCount = 1;
+
+    // Player modes for versus mode
+    const player1Modes = ["Keys", "AI　", "None"];
+    const player2Modes = ["WASD", "AI　", "None"];
+    const player3Modes = ["TFGH", "AI　", "None"];
+    const player4Modes = ["IJKL", "AI　", "None"];
+    
+    // Initialize with saved settings or defaults
+    let player1Mode = localStorage.getItem('player1Mode') ? parseInt(localStorage.getItem('player1Mode')) : 0;
+    let player2Mode = localStorage.getItem('player2Mode') ? parseInt(localStorage.getItem('player2Mode')) : 0;
+    let player3Mode = localStorage.getItem('player3Mode') ? parseInt(localStorage.getItem('player3Mode')) : 2;
+    let player4Mode = localStorage.getItem('player4Mode') ? parseInt(localStorage.getItem('player4Mode')) : 2;
+    let roundsCount = localStorage.getItem('roundsCount') ? parseInt(localStorage.getItem('roundsCount')) : 3;
+
+    function initVersusSettings() {
+      updatePlayerMode(1, player1Mode);
+      updatePlayerMode(2, player2Mode);
+      updatePlayerMode(3, player3Mode);
+      updatePlayerMode(4, player4Mode);
+      document.getElementById('rounds-count').textContent = roundsCount;
+      document.getElementById('versus-apple-count').textContent = appleCount;
+      document.getElementById('versus-speed-count').textContent = speedCount;
+    }
+
+    function saveVersusSettings() {
+      localStorage.setItem('player1Mode', player1Mode);
+      localStorage.setItem('player2Mode', player2Mode);
+      localStorage.setItem('player3Mode', player3Mode);
+      localStorage.setItem('player4Mode', player4Mode);
+      localStorage.setItem('roundsCount', roundsCount);
+    }
+
+    function startGameLoop() {
+      if (gameLoopId !== null) {
+        cancelAnimationFrame(gameLoopId);
+      }
+      
+      lastUpdateTime = performance.now();
+      gameLoopId = requestAnimationFrame(gameLoop);
+    }
+
+    function stopGameLoop() {
+      if (gameLoopId !== null) {
+        cancelAnimationFrame(gameLoopId);
+        gameLoopId = null;
+      }
+    }
+
+    function gameLoop(timestamp) {
+      if (isPaused || isGameOver) {
+        gameLoopId = requestAnimationFrame(gameLoop);
+        return;
+      }
+
+      const deltaTime = timestamp - lastUpdateTime;
+      
+      if (deltaTime >= frameDelay) {
+        lastUpdateTime = timestamp - (deltaTime % frameDelay);
+        
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (isVersusMode) {
+          updateVersusGame();
+        } else {
+          updateClassicGame();
+        }
+
+        drawBorder();
+      }
+      
+      gameLoopId = requestAnimationFrame(gameLoop);
+    }
+
+    document.getElementById('pause-button').addEventListener('click', function () {
+      togglePause(!isPaused);
+      isPaused = !isPaused;
+      this.textContent = isPaused ? 'Resume' : 'Pause';
+      
+      if (!isPaused && gameLoopId === null) {
+        startGameLoop();
+      }
+    });
+
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    function spawnApples() {
+      apples = [];
+      for (let i = 0; i < appleCount; i++) {
+        spawnApple();
+      }
+    }
+
+    function spawnApple() {
+      let apple;
+      let isAppleOnSnake;
+      do {
+        apple = {
+          x: getRandomInt(1, (canvas.width / grid) - 2) * grid,
+          y: getRandomInt(1, (canvas.height / grid) - 2) * grid
+        };
+
+        if (isVersusMode) {
+          isAppleOnSnake = players.some(player => 
+            player.cells.some(cell => cell.x === apple.x && cell.y === apple.y)
+          );
+        } else {
+          isAppleOnSnake = snake.cells.some(cell => cell.x === apple.x && cell.y === apple.y);
+        }
+      } while (isAppleOnSnake);
+
+      apples.push(apple);
+    }
+
+    function updateClassicGame() {
+      if (isGameOver) {
+        return;
+      }
+      
+      if (isAI) {
+        aiMove();
+      } else {
+        processInputQueue();
+      }
+
+      snake.x += snake.dx;
+      snake.y += snake.dy;
+
+      if (snake.x < grid || snake.x >= canvas.width - grid || snake.y < grid || snake.y >= canvas.height - grid) {
+        gameOver();
+      }
+
+      snake.cells.unshift({ x: snake.x, y: snake.y });
+      if (snake.cells.length > snake.maxCells) {
+        snake.cells.pop();
+      }
+
+      context.fillStyle = 'red';
+      context.font = "16px 'Courier New', monospace";
+      apples.forEach(apple => {
+        context.fillText('@', apple.x + 4, apple.y + 12);
+      });
+
+      context.fillStyle = isGameOver ? 'red' : '#b4fa97';
+      snake.cells.forEach(function (cell, index) {
+        if (index === 0) {
+          context.fillText('O', cell.x + 4, cell.y + 12);
+        } else if (index === snake.cells.length - 1 || index === snake.cells.length - 2) {
+          context.fillText('-', cell.x + 4, cell.y + 12);
+        } else {
+          context.fillText('=', cell.x + 4, cell.y + 12);
+        }
+
+        apples.forEach((apple, i) => {
+          if (cell.x === apple.x && cell.y === apple.y) {
+            snake.maxCells++;
+            apples.splice(i, 1);
+            spawnApple();
+            score++;
+            updateScore();
+          }
+        });
+
+        for (var i = index + 1; i < snake.cells.length; i++) {
+          if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+            gameOver();
+          }
+        }
+      });
+    }
+
+    function updateVersusGame() {
+      players.forEach((player) => {
+        if (!player.isAlive) return;
+
+        if (player.isAI) {
+          versusAIMove(player);
+        }
+
+        if (player.inputQueue.length > 0) {
+          let nextDirection = player.inputQueue[0];
+          player.dx = nextDirection.dx;
+          player.dy = nextDirection.dy;
+          player.inputQueue = [];
+        }
+
+        player.x += player.dx;
+        player.y += player.dy;
+
+        if (player.x < grid || player.x >= canvas.width - grid || player.y < grid || player.y >= canvas.height - grid) {
+          player.isAlive = false;
+          activePlayers = players.filter(p => p.isAlive).length;
+          checkRoundEnd();
+          return;
+        }
+
+        player.cells.unshift({ x: player.x, y: player.y });
+        
+        if (player.cells.length > player.maxCells) {
+          player.cells.pop();
+        }
+
+        apples.forEach((apple, appleIndex) => {
+          if (player.x === apple.x && player.y === apple.y) {
+            player.maxCells++;
+            apples.splice(appleIndex, 1);
+            spawnApple();
+          }
+        });
+
+        for (let i = 1; i < player.cells.length; i++) {
+          if (player.x === player.cells[i].x && player.y === player.cells[i].y) {
+            player.isAlive = false;
+            activePlayers = players.filter(p => p.isAlive).length;
+            checkRoundEnd();
+            return;
+          }
+        }
+
+        players.forEach((otherPlayer) => {
+          if (player === otherPlayer || !otherPlayer.isAlive) return;
+          
+          otherPlayer.cells.forEach(cell => {
+            if (player.x === cell.x && player.y === cell.y) {
+              player.isAlive = false;
+              activePlayers = players.filter(p => p.isAlive).length;
+              checkRoundEnd();
+              return;
+            }
+          });
+        });
+      });
+
+      context.fillStyle = 'red';
+      context.font = "16px 'Courier New', monospace";
+      apples.forEach(apple => {
+        context.fillText('@', apple.x + 4, apple.y + 12);
+      });
+
+      players.forEach((player) => {
+        if (!player.isAlive) return;
+        drawPlayer(player);
+      });
+    }
+
+    function drawPlayer(player) {
+      const colors = ['green', 'blue', 'orange', 'purple'];
+      context.fillStyle = colors[player.originalIndex];
+      
+      player.cells.forEach((cell, cellIndex) => {
+        if (cellIndex === 0) {
+          context.fillText('O', cell.x + 4, cell.y + 12);
+        } else if (cellIndex === player.cells.length - 1 || cellIndex === player.cells.length - 2) {
+          context.fillText('-', cell.x + 4, cell.y + 12);
+        } else {
+          context.fillText('=', cell.x + 4, cell.y + 12);
+        }
+      });
+    }
+
+    function versusAIMove(player) {
+      let path = findPathToAppleVersus(player);
+      if (path.length > 0) {
+        let nextMove = path[0];
+        player.dx = nextMove.x - player.x;
+        player.dy = nextMove.y - player.y;
+      } else {
+        versusSurvivalMode(player);
+      }
+    }
+
+    function findPathToAppleVersus(player) {
+      let start = { x: player.x, y: player.y };
+      let target = apples[0];
+
+      let queue = [{ x: start.x, y: start.y, path: [] }];
+      let visited = new Set();
+      visited.add(`${start.x},${start.y}`);
+
+      while (queue.length > 0) {
+        let current = queue.shift();
+
+        if (current.x === target.x && current.y === target.y) {
+          return current.path;
+        }
+
+        let neighbors = [
+          { x: current.x + grid, y: current.y },
+          { x: current.x - grid, y: current.y },
+          { x: current.x, y: current.y + grid },
+          { x: current.x, y: current.y - grid }
+        ];
+
+        for (let neighbor of neighbors) {
+          let key = `${neighbor.x},${neighbor.y}`;
+          if (
+            !visited.has(key) &&
+            neighbor.x >= grid &&
+            neighbor.x < canvas.width - grid &&
+            neighbor.y >= grid &&
+            neighbor.y < canvas.height - grid &&
+            !isCellOccupiedVersus(neighbor.x, neighbor.y, player)
+          ) {
+            visited.add(key);
+            queue.push({
+              x: neighbor.x,
+              y: neighbor.y,
+              path: [...current.path, { x: neighbor.x, y: neighbor.y }]
+            });
+          }
+        }
+      }
+
+      return [];
+    }
+
+    function isCellOccupiedVersus(x, y, currentPlayer) {
+      for (let player of players) {
+        if (!player.isAlive) continue;
+        
+        for (let i = (player === currentPlayer ? 1 : 0); i < player.cells.length; i++) {
+          if (x === player.cells[i].x && y === player.cells[i].y) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function versusSurvivalMode(player) {
+      let possibleMoves = [
+        { dx: grid, dy: 0 },
+        { dx: -grid, dy: 0 },
+        { dx: 0, dy: grid },
+        { dx: 0, dy: -grid }
+      ];
+
+      let safeMoves = possibleMoves.filter(move => {
+        let nextX = player.x + move.dx;
+        let nextY = player.y + move.dy;
+
+        return (
+          nextX >= grid &&
+          nextX < canvas.width - grid &&
+          nextY >= grid &&
+          nextY < canvas.height - grid &&
+          !isCellOccupiedVersus(nextX, nextY, player)
+        );
+      });
+
+      if (safeMoves.length > 0) {
+        let randomMove = safeMoves[Math.floor(Math.random() * safeMoves.length)];
+        player.dx = randomMove.dx;
+        player.dy = randomMove.dy;
+      } else {
+        player.isAlive = false;
+        activePlayers = players.filter(p => p.isAlive).length;
+        checkRoundEnd();
+      }
+    }
+
+    function checkRoundEnd() {
+      const alivePlayers = players.filter(player => player.isAlive);
+      if (alivePlayers.length === 1 && !isRoundOver) {
+        isRoundOver = true;
+        
+        const winnerIndex = alivePlayers[0].originalIndex;
+        playerPoints[winnerIndex]++;
+        updatePlayerPoints();
+        
+        const roundWinnerElement = document.getElementById('round-winner');
+        roundWinnerElement.textContent = `Player ${winnerIndex + 1} wins round ${currentRound}!`;
+        roundWinnerElement.style.display = 'block';
+        roundWinnerElement.style.color = ['green', 'blue', 'orange', 'purple'][winnerIndex];
+
+        if (currentRound >= totalRounds) {
+          endGame();
+        } else {
+          currentRound++;
+          document.getElementById('current-round').textContent = `Round: ${currentRound}`;
+          document.getElementById('score').textContent = `[Round: ${currentRound}]`;
+          setTimeout(() => {
+            document.getElementById('round-winner').style.display = 'none';
+            startVersusRound();
+          }, 2000);
+        }
+      }
+    }
+
+    function startGameOverLoop() {
+      if (gameOverLoopId !== null) {
+        cancelAnimationFrame(gameOverLoopId);
+      }
+      lastUpdateTime = performance.now();
+      gameOverLoopId = requestAnimationFrame(gameOverLoop);
+    }
+
+    function stopGameOverLoop() {
+      if (gameOverLoopId !== null) {
+        cancelAnimationFrame(gameOverLoopId);
+        gameOverLoopId = null;
+      }
+    }
+
+    function gameOverLoop(timestamp) {
+      if (!isGameOverAnimation) {
+        stopGameOverLoop();
+        return;
+      }
+
+      const deltaTime = timestamp - lastUpdateTime;
+      
+      if (deltaTime >= 250) {
+        lastUpdateTime = timestamp - (deltaTime % 250);
+        
+        if (snake.cells.length > 0) {
+          snake.cells.pop();
+          drawGameOverState();
+        } else {
+          isGameOverAnimation = false;
+          canRestart = true;
+        }
+      }
+      
+      gameOverLoopId = requestAnimationFrame(gameOverLoop);
+    }
+
+    function drawGameOverState() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      drawBorder();
+      
+      context.fillStyle = 'red';
+      context.font = "16px 'Courier New', monospace";
+      apples.forEach(apple => {
+        context.fillText('@', apple.x + 4, apple.y + 12);
+      });
+      
+      context.fillStyle = 'red';
+      snake.cells.forEach(function (cell, index) {
+        if (index === 0) {
+          context.fillText('O', cell.x + 4, cell.y + 12);
+        } else if (index === snake.cells.length - 1 || index === snake.cells.length - 2) {
+          context.fillText('-', cell.x + 4, cell.y + 12);
+        } else {
+          context.fillText('=', cell.x + 4, cell.y + 12);
+        }
+      });
+    }
+
+////////////////////////////////////////// Ascii Versus you win starts here
+
+const titleVariants = {
+  default: `    _             _ _      ____              _        \n   / \\   ___  ___(_|_)    / ___| _ __   __ _| | _____ \n  / _ \\ / __|/ __| | |    \\___ \\| '_ \\ / _\` | |/ / _ \\\n / ___ \\\\__ \\ (__| | |     ___) | | | | (_| |   <  __/\n/_/   \\_\\___/\\___|_|_|    |____/|_| |_|\\__,_|_|\\_\\___|`,
+  
+  classic: `  ____ _               _        ____              _        \n / ___| | __ _ ___ ___(_) ___  / ___| _ __   __ _| | _____ \n| |   | |/ _\` / __/ __| |/ __| \\___ \\| '_ \\ / _\` | |/ / _ \\\n| |___| | (_| \\__ \\__ \\ | (__   ___) | | | | (_| |   <  __/\n \\____|_|\\__,_|___/___/_|\\___| |____/|_| |_|\\__,_|_|\\_\\___|`,
+  
+  versus: `__     __                        __  __           _      \n\\ \\   / /__ _ __ ___ _   _ ___  |  \\/  | ___   __| | ___ \n \\ \\ / / _ \\ '__/ __| | | / __| | |\\/| |/ _ \\ / _\` |/ _ \\\n  \\ V /  __/ |  \\__ \\ |_| \\__ \\ | |  | | (_) | (_| |  __/\n   \\_/ \\___|_|  |___/\\__,_|___/ |_|  |_|\\___/ \\__,_|\\___|`
+};
+
+const titleElement = document.createElement('div');
+titleElement.id = 'game-title';
+titleElement.style.position = 'absolute';
+titleElement.style.top = '-130px';
+titleElement.style.left = '50%';
+titleElement.style.transform = 'translateX(-50%)';
+titleElement.style.fontFamily = "'Courier New', monospace";
+titleElement.style.fontSize = '11px';
+titleElement.style.color = '#b4fa97';
+titleElement.style.whiteSpace = 'pre';
+titleElement.style.lineHeight = '1.3';
+titleElement.style.textAlign = 'center';
+titleElement.style.zIndex = '10';
+titleElement.textContent = titleVariants.default;
+
+document.querySelector('.game-container').prepend(titleElement);
+
+function updateTitle(mode) {
+  const title = titleElement;
+  switch(mode) {
+    case 'classic':
+      title.textContent = titleVariants.classic;
+      break;
+    case 'versus':
+      title.textContent = titleVariants.versus;
+      break;
+    default:
+      title.textContent = titleVariants.default;
+  }
+}
+
+const asciiNumbers = {
+  1: ` _ \n/ |\n| |\n| |\n|_|`,
+  2: ` ____ \n|___ \\ \n  __) |\n / __/ \n|_____|`,
+  3: ` _____ \n|___ / \n  |_ \\ \n ___) |\n|____/ `,
+  4: ` _  _   \n| || |  \n| || |_ \n|__   _|\n   |_|  `
+};
+
+const winsTheText = `          _             _   _           \n__      _(_)_ __  ___  | |_| |__   ___  \n\\ \\ /\\ / / | '_ \\/ __| | __| '_ \\ / _ \\ \n \\ V  V /| | | | \\__ \\ | |_| | | |  __/ \n  \\_/\\_/ |_|_| |_|___/  \\__|_| |_|\\___|`;
+
+const gameText = `                            _ \n  __ _  __ _ _ __ ___   ___| |\n / _\` |/ _\` | '_ \\ _ \\ / _ \\ |\n| (_| | (_| | | | | | |  __/_|\n \\__, |\\__,_|_| |_| |_|\\___(_)\n |___/                        `;
+
+function endGame() {
+  isGameWon = true;
+  
+  let maxPoints = Math.max(...playerPoints);
+  let winners = [];
+  for (let i = 0; i < playerPoints.length; i++) {
+    if (playerPoints[i] === maxPoints) {
+      winners.push(i);
+    }
+  }
+
+  const gameWinnerElement = document.getElementById('game-winner');
+  gameWinnerElement.style.whiteSpace = 'pre';
+  gameWinnerElement.style.fontFamily = "'Courier New', monospace";
+  gameWinnerElement.style.fontSize = '10px';
+  gameWinnerElement.style.lineHeight = '1.1';
+  gameWinnerElement.style.textAlign = 'center';
+
+  if (winners.length === 1) {
+    const winnerNumber = winners[0] + 1;
+    const winnerColor = ['green', 'blue', 'orange', 'purple'][winners[0]];
+    
+    gameWinnerElement.innerHTML = 
+      `<div style="color:${winnerColor}">${asciiNumbers[winnerNumber]}</div>
+       <div style="color:${winnerColor}">${winsTheText}</div>
+       <div style="color:${winnerColor}">${gameText}</div>`;
+  } else {
+    // For ties, use the default color
+    gameWinnerElement.innerHTML = 
+      `<div style="color:#b4fa97">Tie between players: ${winners.map(w => w + 1).join(', ')}</div>`;
+  }
+  
+  gameWinnerElement.style.display = 'block';
+
+  setTimeout(() => {
+    document.getElementById('game-winner').style.display = 'none';
+    returnToMenu();
+  }, 3000);
+}
+
+    function updatePlayerPoints() {
+      document.querySelector('.player1-points').textContent = `Player 1: ${playerPoints[0]}`;
+      document.querySelector('.player2-points').textContent = `Player 2: ${playerPoints[1]}`;
+      document.querySelector('.player3-points').textContent = `Player 3: ${playerPoints[2]}`;
+      document.querySelector('.player4-points').textContent = `Player 4: ${playerPoints[3]}`;
+    }
+
+    function shrinkSnake() {
+      if (snake.cells.length > 0) {
+        snake.cells.pop();
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        drawBorder();
+        
+        context.fillStyle = 'red';
+        context.font = "16px 'Courier New', monospace";
+        apples.forEach(apple => {
+          context.fillText('@', apple.x + 4, apple.y + 12);
+        });
+        
+        context.fillStyle = 'red';
+        snake.cells.forEach(function (cell, index) {
+          if (index === 0) {
+            context.fillText('O', cell.x + 4, cell.y + 12);
+          } else if (index === snake.cells.length - 1 || index === snake.cells.length - 2) {
+            context.fillText('-', cell.x + 4, cell.y + 12);
+          } else {
+            context.fillText('=', cell.x + 4, cell.y + 12);
+          }
+        });
+        
+        setTimeout(shrinkSnake, 250);
+      } else {
+        isShrinking = false;
+        canRestart = true;
+        document.getElementById('game-over').style.display = 'block';
+      }
+    }
+
+    function redrawSnake() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      drawBorder();
+      
+      context.fillStyle = 'red';
+      context.font = "16px 'Courier New', monospace";
+      apples.forEach(apple => {
+        context.fillText('@', apple.x + 4, apple.y + 12);
+      });
+      
+      context.fillStyle = 'red';
+      snake.cells.forEach(function (cell, index) {
+        if (index === 0) {
+          context.fillText('O', cell.x + 4, cell.y + 12);
+        } else if (index === snake.cells.length - 1 || index === snake.cells.length - 2) {
+          context.fillText('-', cell.x + 4, cell.y + 12);
+        } else {
+          context.fillText('=', cell.x + 4, cell.y + 12);
+        }
+      });
+    }
+
+    function aiMove() {
+      let path = findPathToApple();
+      if (path.length > 0) {
+        let nextMove = path[0];
+        snake.dx = nextMove.x - snake.x;
+        snake.dy = nextMove.y - snake.y;
+      } else {
+        survivalMode();
+      }
+    }
+
+    function survivalMode() {
+      let possibleMoves = [
+        { dx: grid, dy: 0 },
+        { dx: -grid, dy: 0 },
+        { dx: 0, dy: grid },
+        { dx: 0, dy: -grid }
+      ];
+
+      let safeMoves = possibleMoves.filter(move => {
+        let nextX = snake.x + move.dx;
+        let nextY = snake.y + move.dy;
+
+        return (
+          nextX >= grid &&
+          nextX < canvas.width - grid &&
+          nextY >= grid &&
+          nextY < canvas.height - grid &&
+          !snake.cells.some(cell => cell.x === nextX && cell.y === nextY)
+        );
+      });
+
+      if (safeMoves.length > 0) {
+        let randomMove = safeMoves[Math.floor(Math.random() * safeMoves.length)];
+        snake.dx = randomMove.dx;
+        snake.dy = randomMove.dy;
+      } else {
+        gameOver();
+      }
+    }
+
+    function findPathToApple() {
+      let start = { x: snake.x, y: snake.y };
+      let target = apples[0];
+
+      let queue = [{ x: start.x, y: start.y, path: [] }];
+      let visited = new Set();
+      visited.add(`${start.x},${start.y}`);
+
+      while (queue.length > 0) {
+        let current = queue.shift();
+
+        if (current.x === target.x && current.y === target.y) {
+          return current.path;
+        }
+
+        let neighbors = [
+          { x: current.x + grid, y: current.y },
+          { x: current.x - grid, y: current.y },
+          { x: current.x, y: current.y + grid },
+          { x: current.x, y: current.y - grid }
+        ];
+
+        for (let neighbor of neighbors) {
+          let key = `${neighbor.x},${neighbor.y}`;
+          if (
+            !visited.has(key) &&
+            neighbor.x >= grid &&
+            neighbor.x < canvas.width - grid &&
+            neighbor.y >= grid &&
+            neighbor.y < canvas.height - grid &&
+            !snake.cells.some(cell => cell.x === neighbor.x && cell.y === neighbor.y)
+          ) {
+            visited.add(key);
+            queue.push({
+              x: neighbor.x,
+              y: neighbor.y,
+              path: [...current.path, { x: neighbor.x, y: neighbor.y }]
+            });
+          }
+        }
+      }
+
+      return [];
+    }
+
+    function drawBorder() {
+      context.fillStyle = '#b4fa97';
+      for (var x = 0; x < canvas.width; x += grid) {
+        if (x === 0 || x === canvas.width - grid) {
+          context.fillText("", x + 4, 4);
+          context.fillText("", x + 4, canvas.height - 12);
+        } else {
+          context.fillText("_", x + 4, 4);
+          if (x < (canvas.width / 2) - (grid * 4) || x > (canvas.width / 2) + (grid * 4)) {
+            context.fillText("_", x + 4, canvas.height - 12);
+          }
+        }
+      }
+
+      for (var y = 0; y < canvas.height; y += grid) {
+        if (y === 0 || y === canvas.height - grid) {
+          context.fillText("+", 4, y + 12);
+          context.fillText("+", canvas.width - 12, y + 12);
+        } else {
+          context.fillText("|", 4, y + 12);
+          context.fillText("|", canvas.width - 12, y + 12);
+        }
+      }
+    }
+
+    function gameOver() {
+      if (isGameOver) return;
+      
+      isGameOver = true;
+
+        if (isAI && !isClassicMode && !isVersusMode) {
+    // If it's the demo mode (AI playing in main menu), instantly reset
+    restartGame();
+    return;
+  }
+  
+      isGameOverAnimation = true;
+      snake.dx = 0;
+      snake.dy = 0;
+      
+      stopGameLoop();
+      startGameOverLoop();
+      document.getElementById('game-over').style.display = 'block';
+    }
+
+function restartGame() {
+  // Clear any existing game over state
+  isGameOver = false;
+  isGameOverAnimation = false;
+  canRestart = true;
+  document.getElementById('game-over').style.display = 'none';
+  stopGameOverLoop();
+
+  // Reset snake position with proper margin from edges
+  const safeMargin = grid * 5; // Increased from 3 to 5 for more spacing
+  const maxX = canvas.width - safeMargin;
+  const maxY = canvas.height - safeMargin;
+  
+  // Generate random position that's at least safeMargin away from all edges
+  const randomX = Math.floor(Math.random() * ((maxX - safeMargin) / grid)) * grid + safeMargin;
+  const randomY = Math.floor(Math.random() * ((maxY - safeMargin) / grid)) * grid + safeMargin;
+
+  snake = {
+    x: randomX,
+    y: randomY,
+    dx: grid,
+    dy: 0,
+    cells: [],
+    maxCells: 4
+  };
+
+  // Reset game state
+  apples = [];
+  spawnApples();
+  score = 0;
+  updateScore();
+  inputQueue = [];
+
+  // Clear and redraw
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  drawBorder();
+  context.fillStyle = 'red';
+  context.font = "16px 'Courier New', monospace";
+  apples.forEach(apple => {
+    context.fillText('@', apple.x + 4, apple.y + 12);
+  });
+
+  // Set game speed
+  fps = 10 + (speedCount - 1) * 2;
+  frameDelay = 1000 / fps;
+
+  startGameLoop();
+}
+
+    function startVersusGame() {
+      updateTitle('versus');
+      let activePlayerCount = 0;
+      if (player1Mode !== 2) activePlayerCount++;
+      if (player2Mode !== 2) activePlayerCount++;
+      if (player3Mode !== 2) activePlayerCount++;
+      if (player4Mode !== 2) activePlayerCount++;
+
+      if (activePlayerCount < 2) {
+        const roundWinnerElement = document.getElementById('round-winner');
+        roundWinnerElement.textContent = "Need at least 2 players to start!";
+        roundWinnerElement.style.display = 'block';
+        roundWinnerElement.style.color = 'red';
+        
+        setTimeout(() => {
+          roundWinnerElement.style.display = 'none';
+        }, 2000);
+        return;
+      }
+
+      isVersusMode = true;
+      isClassicMode = false;
+      totalRounds = roundsCount;
+      currentRound = 1;
+      playerPoints = [0, 0, 0, 0];
+      updatePlayerPoints();
+      
+      document.getElementById('speed-count').textContent = speedCount;
+      
+      fps = 10 + (speedCount - 1) * 2;
+      frameDelay = 1000 / fps;
+      
+      document.getElementById('demo-text').style.display = 'none';
+      document.getElementById('versus-settings').style.display = 'none';
+      document.getElementById('play-button').style.display = 'none';
+      document.getElementById('return-button').style.display = 'block';
+      document.getElementById('high-score').style.display = 'none';
+      document.getElementById('player-points').style.display = 'block';
+      document.getElementById('current-round').style.display = 'block';
+      document.getElementById('current-round').textContent = `Round: ${currentRound}`;
+      document.getElementById('score').textContent = `[Round: ${currentRound}]`;
+
+      startVersusRound();
+    }
+
+    function startVersusRound() {
+      isRoundOver = false;
+      isGameWon = false;
+      stopGameLoop();
+      
+      fps = 10 + (speedCount - 1) * 2;
+      frameDelay = 1000 / fps;
+      
+      players = [];
+      activePlayers = 0;
+      
+      if (player1Mode !== 2) {
+        players.push(createPlayer(0, player1Mode === 1));
+        activePlayers++;
+      }
+      
+      if (player2Mode !== 2) {
+        players.push(createPlayer(1, player2Mode === 1));
+        activePlayers++;
+      }
+      
+      if (player3Mode !== 2) {
+        players.push(createPlayer(2, player3Mode === 1));
+        activePlayers++;
+      }
+      
+      if (player4Mode !== 2) {
+        players.push(createPlayer(3, player4Mode === 1));
+        activePlayers++;
+      }
+      
+      if (activePlayers < 2) {
+        const roundWinnerElement = document.getElementById('round-winner');
+        roundWinnerElement.textContent = "Need at least 2 players to start!";
+        roundWinnerElement.style.display = 'block';
+        roundWinnerElement.style.color = 'red';
+        
+        setTimeout(() => {
+          roundWinnerElement.style.display = 'none';
+          returnToMenu();
+        }, 2000);
+        return;
+      }
+      
+      apples = [];
+      spawnApples();
+      
+      startGameLoop();
+    }
+
+    function createPlayer(originalIndex, isAI) {
+      const safeMargin = grid * 5;
+      const maxX = canvas.width - safeMargin;
+      const maxY = canvas.height - safeMargin;
+      
+      let x, y;
+      let isValidPosition = false;
+      let attempts = 0;
+      
+      while (!isValidPosition && attempts < 100) {
+        attempts++;
+        x = Math.floor(Math.random() * ((maxX - safeMargin) / grid)) * grid + safeMargin;
+        y = Math.floor(Math.random() * ((maxY - safeMargin) / grid)) * grid + safeMargin;
+        
+        isValidPosition = true;
+        for (let player of players) {
+          const dx = player.x - x;
+          const dy = player.y - y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < grid * 10) {
+            isValidPosition = false;
+            break;
+          }
+        }
+      }
+      
+      if (!isValidPosition) {
+        x = Math.floor(Math.random() * ((maxX - safeMargin) / grid)) * grid + safeMargin;
+        y = Math.floor(Math.random() * ((maxY - safeMargin) / grid)) * grid + safeMargin;
+      }
+      
+      let dx = grid;
+      let dy = 0;
+      if (x > canvas.width / 2) {
+        dx = -grid;
+      }
+      
+      return {
+        x: x,
+        y: y,
+        dx: dx,
+        dy: dy,
+        cells: [],
+        maxCells: 4,
+        isAI: isAI,
+        isAlive: true,
+        inputQueue: [],
+        originalIndex: originalIndex
+      };
+    }
+
+    function updateScore() {
+      var scoreElement = document.getElementById('score');
+      if (isVersusMode) {
+        scoreElement.textContent = `[Round: ${currentRound}]`;
+      } else {
+        scoreElement.textContent = '[Score: ' + score + ']';
+      }
+      
+      if (isClassicMode && score > highScore) {
+        highScore = score;
+        document.getElementById('high-score').textContent = 'High Score: ' + highScore;
+        localStorage.setItem('highScore', highScore);
+      }
+    }
+
+document.addEventListener('keydown', function (e) {
+    if (e.which === 80) { // 80 is keycode for 'P'
+    togglePause(!isPaused);
+    return;
+  }
+  if (isGameOver && e.which === 13 && canRestart) {
+    document.getElementById('game-over').style.display = 'none';
+    if (isVersusMode) {
+      startVersusRound();
+    } else {
+      restartGame();
+    }
+    return;
+  }
+
+      if (isDeathAnimationStarted || isShrinking) return;
+
+      if (isVersusMode) {
+        players.forEach((player) => {
+          if (player.isAI || !player.isAlive) return;
+          
+          let nextDx = player.dx;
+          let nextDy = player.dy;
+          let keys = [];
+          
+          switch(player.originalIndex) {
+            case 0:
+              keys = [37, 38, 39, 40];
+              break;
+            case 1:
+              keys = [65, 87, 68, 83];
+              break;
+            case 2:
+              keys = [70, 84, 72, 71];
+              break;
+            case 3:
+              keys = [74, 73, 76, 75];
+              break;
+          }
+          
+          if (e.which === keys[0] && player.dx === 0) {
+            nextDx = -grid;
+            nextDy = 0;
+          } else if (e.which === keys[1] && player.dy === 0) {
+            nextDx = 0;
+            nextDy = -grid;
+          } else if (e.which === keys[2] && player.dx === 0) {
+            nextDx = grid;
+            nextDy = 0;
+          } else if (e.which === keys[3] && player.dy === 0) {
+            nextDx = 0;
+            nextDy = grid;
+          }
+
+          if (nextDx !== -player.dx || nextDy !== -player.dy) {
+            player.inputQueue = [{ dx: nextDx, dy: nextDy }];
+          }
+        });
+      } else if (!isAI) {
+        let nextDx = snake.dx;
+        let nextDy = snake.dy;
+
+        if (e.which === 37 && snake.dx === 0) {
+          nextDx = -grid;
+          nextDy = 0;
+        } else if (e.which === 38 && snake.dy === 0) {
+          nextDx = 0;
+          nextDy = -grid;
+        } else if (e.which === 39 && snake.dx === 0) {
+          nextDx = grid;
+          nextDy = 0;
+        } else if (e.which === 40 && snake.dy === 0) {
+          nextDx = 0;
+          nextDy = grid;
+        }
+
+        if (nextDx !== -snake.dx || nextDy !== -snake.dy) {
+          inputQueue = [{ dx: nextDx, dy: nextDy }];
+        }
+      }
+    });
+
+    function processInputQueue() {
+      if (inputQueue.length > 0) {
+        let nextDirection = inputQueue[0];
+        snake.dx = nextDirection.dx;
+        snake.dy = nextDirection.dy;
+      }
+    }
+
+    document.getElementById('play-button').addEventListener('click', function() {
+      document.getElementById('settings').style.display = 'block';
+      document.getElementById('return-button').style.display = 'block';
+      document.getElementById('versus-button').style.display = 'none';
+      this.classList.add('selected');
+    });
+
+    document.getElementById('start-button').addEventListener('click', function() {
+        updateTitle('classic');
+
+      if (isDeathAnimationStarted && !canRestart) return;
+
+      isAI = false;
+      isClassicMode = true;
+      isVersusMode = false;
+      document.getElementById('demo-text').style.display = 'none';
+      document.getElementById('settings').style.display = 'none';
+      document.getElementById('play-button').style.display = 'none';
+      document.getElementById('return-button').style.display = 'block';
+      document.getElementById('high-score').style.display = 'block';
+      document.getElementById('high-score').textContent = 'High Score: ' + highScore;
+      document.getElementById('player-points').style.display = 'none';
+      document.getElementById('current-round').style.display = 'none';
+      document.getElementById('score').textContent = '[Score: 0]';
+
+      restartGame();
+    });
+
+function returnToMenu() {
+    updateTitle('default');
+  // Clear any game over state
+  isGameOver = false;
+  isGameOverAnimation = false;
+  canRestart = true;
+  document.getElementById('game-over').style.display = 'none';
+  stopGameOverLoop();
+
+  // Store whether we were in a game mode
+  const wasInGameMode = isClassicMode || isVersusMode;
+
+  // Stop any running game loops
+  //stopGameLoop();
+
+  document.getElementById('settings').style.display = 'none';
+  document.getElementById('versus-settings').style.display = 'none';
+  document.getElementById('return-button').style.display = 'none';
+  document.getElementById('play-button').style.display = 'block';
+  document.getElementById('demo-text').style.display = 'block';
+  document.getElementById('versus-button').style.display = 'block';
+  document.getElementById('play-button').classList.remove('selected');
+  document.getElementById('versus-button').classList.remove('selected');
+  document.getElementById('round-winner').style.display = 'none';
+  document.getElementById('game-winner').style.display = 'none';
+  document.getElementById('high-score').style.display = 'none';
+  document.getElementById('player-points').style.display = 'none';
+  document.getElementById('current-round').style.display = 'none';
+
+  if (wasInGameMode) {
+    // Save settings and reset game mode flags
+    saveVersusSettings();
+    isClassicMode = false;
+    isVersusMode = false;
+    
+    // Reset score display
+    document.getElementById('score').textContent = 'Score: 0';
+    
+    // Force pause and schedule unpause
+    togglePause(true);
+    setTimeout(() => {
+      togglePause(false);
+      // Restart demo mode if needed
+      if (!isAI) {
+        isAI = true;
+        restartGame();
+      }
+    }, 20);
+  }
+}
+
+// New helper function to properly handle pause state
+function togglePause(shouldPause) {
+  isPaused = shouldPause;
+  const pauseButton = document.getElementById('pause-button');
+  document.getElementById('pause-button').textContent = isPaused ? 'Resume' : 'Pause';
+  
+  if (!isPaused && gameLoopId === null) {
+    startGameLoop();
+  }
+}
+
+// Update the pause button click handler to use the new function
+document.getElementById('pause-button').addEventListener('click', function() {
+  togglePause(!isPaused);
+});
+
+    document.getElementById('return-button').addEventListener('click', returnToMenu);
+
+    document.getElementById('versus-button').addEventListener('click', function() {
+      document.getElementById('versus-settings').style.display = 'block';
+      document.getElementById('return-button').style.display = 'block';
+      document.getElementById('play-button').style.display = 'none';
+      document.getElementById('versus-button').style.display = 'none';
+      this.classList.add('selected');
+      initVersusSettings();
+    });
+
+    document.getElementById('start-versus-button').addEventListener('click', function() {
+      if (isDeathAnimationStarted && !canRestart) return;
+
+      startVersusGame();
+    });
+
+    document.getElementById('increase-apple').addEventListener('click', function() {
+      if (appleCount < 5) {
+        appleCount++;
+        document.getElementById('apple-count').textContent = appleCount;
+        document.getElementById('versus-apple-count').textContent = appleCount;
+        spawnApple();
+      }
+    });
+
+    document.getElementById('decrease-apple').addEventListener('click', function() {
+      if (appleCount > 1) {
+        appleCount--;
+        document.getElementById('apple-count').textContent = appleCount;
+        document.getElementById('versus-apple-count').textContent = appleCount;
+        apples.pop();
+      }
+    });
+
+    document.getElementById('versus-increase-apple').addEventListener('click', function() {
+      if (appleCount < 5) {
+        appleCount++;
+        document.getElementById('apple-count').textContent = appleCount;
+        document.getElementById('versus-apple-count').textContent = appleCount;
+        spawnApple();
+      }
+    });
+
+    document.getElementById('versus-decrease-apple').addEventListener('click', function() {
+      if (appleCount > 1) {
+        appleCount--;
+        document.getElementById('apple-count').textContent = appleCount;
+        document.getElementById('versus-apple-count').textContent = appleCount;
+        apples.pop();
+      }
+    });
+
+    document.getElementById('increase-speed').addEventListener('click', function() {
+      if (speedCount < 5) {
+        speedCount++;
+        fps = 10 + (speedCount - 1) * 2;
+        frameDelay = 1000 / fps;
+        document.getElementById('speed-count').textContent = speedCount;
+      }
+    });
+
+    document.getElementById('decrease-speed').addEventListener('click', function() {
+      if (speedCount > 1) {
+        speedCount--;
+        fps = 10 + (speedCount - 1) * 2;
+        frameDelay = 1000 / fps;
+        document.getElementById('speed-count').textContent = speedCount;
+      }
+    });
+
+    function updatePlayerMode(player, mode) {
+      const playerElement = document.getElementById(`player${player}-mode`);
+      let modeText = "";
+      let modes = [];
+      
+      switch(player) {
+        case 1: modes = player1Modes; break;
+        case 2: modes = player2Modes; break;
+        case 3: modes = player3Modes; break;
+        case 4: modes = player4Modes; break;
+      }
+      
+      playerElement.textContent = modes[mode];
+      const playerDiv = document.querySelector(`.player${player}`);
+      if (modes[mode] === "None") {
+        playerDiv.classList.add('none');
+      } else {
+        playerDiv.classList.remove('none');
+      }
+    }
+
+    document.getElementById('player1-prev').addEventListener('click', function() {
+      player1Mode = (player1Mode - 1 + player1Modes.length) % player1Modes.length;
+      updatePlayerMode(1, player1Mode);
+    });
+
+    document.getElementById('player1-next').addEventListener('click', function() {
+      player1Mode = (player1Mode + 1) % player1Modes.length;
+      updatePlayerMode(1, player1Mode);
+    });
+
+    document.getElementById('player2-prev').addEventListener('click', function() {
+      player2Mode = (player2Mode - 1 + player2Modes.length) % player2Modes.length;
+      updatePlayerMode(2, player2Mode);
+    });
+
+    document.getElementById('player2-next').addEventListener('click', function() {
+      player2Mode = (player2Mode + 1) % player2Modes.length;
+      updatePlayerMode(2, player2Mode);
+    });
+
+    document.getElementById('player3-prev').addEventListener('click', function() {
+      player3Mode = (player3Mode - 1 + player3Modes.length) % player3Modes.length;
+      updatePlayerMode(3, player3Mode);
+    });
+
+    document.getElementById('player3-next').addEventListener('click', function() {
+      player3Mode = (player3Mode + 1) % player3Modes.length;
+      updatePlayerMode(3, player3Mode);
+    });
+
+    document.getElementById('player4-prev').addEventListener('click', function() {
+      player4Mode = (player4Mode - 1 + player4Modes.length) % player4Modes.length;
+      updatePlayerMode(4, player4Mode);
+    });
+
+    document.getElementById('player4-next').addEventListener('click', function() {
+      player4Mode = (player4Mode + 1) % player4Modes.length;
+      updatePlayerMode(4, player4Mode);
+    });
+
+    document.getElementById('increase-rounds').addEventListener('click', function() {
+      if (roundsCount < 10) {
+        roundsCount++;
+        document.getElementById('rounds-count').textContent = roundsCount;
+      }
+    });
+
+    document.getElementById('versus-increase-speed').addEventListener('click', function() {
+      if (speedCount < 5) {
+        speedCount++;
+        fps = 10 + (speedCount - 1) * 2;
+        frameDelay = 1000 / fps;
+        document.getElementById('speed-count').textContent = speedCount;
+        document.getElementById('versus-speed-count').textContent = speedCount;
+      }
+    });
+
+    document.getElementById('versus-decrease-speed').addEventListener('click', function() {
+      if (speedCount > 1) {
+        speedCount--;
+        fps = 10 + (speedCount - 1) * 2;
+        frameDelay = 1000 / fps;
+        document.getElementById('speed-count').textContent = speedCount;
+        document.getElementById('versus-speed-count').textContent = speedCount;
+      }
+    });
+
+    document.getElementById('decrease-rounds').addEventListener('click', function() {
+      if (roundsCount > 1) {
+        roundsCount--;
+        document.getElementById('rounds-count').textContent = roundsCount;
+      }
+    });
+
+    fps = 10;
+    frameDelay = 1000 / fps;
+    spawnApples();
+    updateScore();
+    startGameLoop();
+  </script>
+</body>
+</html>
