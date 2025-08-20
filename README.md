@@ -1,3 +1,23 @@
 Ascii Snake with 4 Player Local Co-op
 
-<div style="font-family: SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-size:14px;white-space: pre;background-color: #ffffff; color: #000000;"><div>+---------------------------+</div><div>|                           |</div><div>|                           |</div><div>|                           |</div><div>|      -                    |</div><div>|       -==                 |</div><div>|         ===    =====      |</div><div>|           ==   =   =    　 　 　 　 　 　   |</div><div>|            =====   =      |</div><div>|                    =      |</div><div>|                    O      |</div><div>|                           |</div><div>|                           |</div><div>|                           |</div><div>+--------[Score: 24]--------+</div><div>            [Demo]           </div><div>                             </div><div>     [Play Snake Classic]    </div><div>                             </div><div>                             </div><div>       Play Versus Mode      </div></div>
++---------------------------+
+|　　　　　　　　　　　　|
+|　　　　　　　　　　　　|
+|　　　　　　　　　　　　|
+|　　　-　　　　　　　　|
+|　　　-==　　　　　　　|
+|　　　　===　　=====　　|
+|　　　　　==　　=　　=　|
+|　　　　　　=====　　=　|
+|　　　　　　　　　=　　|
+|　　　　　　　　　O　　|
+|　　　　　　　　　　　　|
+|　　　　　　　　　　　　|
+|　　　　　　　　　　　　|
++--------[Score: 24]--------+
+　　　　　[Demo]　　　　　
+　　　　　　　　　　　　　
+　　[Play Snake Classic]　　
+　　　　　　　　　　　　　
+　　　　　　　　　　　　　
+　　　Play Versus Mode　　　
