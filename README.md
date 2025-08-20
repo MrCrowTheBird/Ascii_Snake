@@ -1,5 +1,7 @@
 Ascii Snake with 4 Player Local Co-op
 
+Uses a single html file to work
+
 ```
 +---------------------------+
 |                           |
