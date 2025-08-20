@@ -1,4 +1,4 @@
-Ascii Snake with 4 Player Local Co-op or you can set other players AI
+Ascii Snake with 4 Player Local Co-op or you can set other players to AI
 
 Uses a single html file to work
 
