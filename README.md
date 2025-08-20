@@ -15,7 +15,7 @@ Ascii Snake with 4 Player Local Co-op
 |           @               |
 |                           |
 |                           |
-+--------[Score: 980]-------+
++--------[Score:  24]-------+
             [Demo]           
                              
      [Play Snake Classic]    
